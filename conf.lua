@@ -1,4 +1,4 @@
 function love.conf(t)
   t.title = "ABLY"
-	t.console = true
+	t.console = false
 end
