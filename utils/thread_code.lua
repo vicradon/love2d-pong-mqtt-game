@@ -1,5 +1,5 @@
-local threadCode = [[
-mqtt = require "libraries/mqtt"
+threadCode = [[
+mqtt = require "mqtt"
 
 local client = mqtt.client{ 
     uri = "mqtt.ably.io", 
@@ -8,7 +8,6 @@ local client = mqtt.client{
     clean = true
     -- port = 8883
 }
-
   
 client:on{
     connect = function(connack)
@@ -44,8 +43,8 @@ client:on{
 ]]
 
 
-function mqtt_connector()
-  local thread = love.thread.newThread(threadCode)
-  thread:start()
-end
+-- function mqtt_connector()
+--   local thread = love.thread.newThread(threadCode)
+--   thread:start()
+-- end
   
