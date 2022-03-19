@@ -6,7 +6,7 @@ function LobbyScreen(loveframes, client)
 	frame:SetWidth(love.graphics.getWidth())
 	frame:SetHeight(love.graphics.getHeight())
 	frame:ShowCloseButton(false)
-    frame:SetState("lobbystate")    
+    frame:SetState("lobbystate")
 
     local infoText = loveframes.Create("text", frame)
 	infoText:SetText({
@@ -24,7 +24,19 @@ function LobbyScreen(loveframes, client)
     startGameButton.OnClick = function(object, x, y)
         -- when this button is clicked, we register the game on the server
         -- How do we register the game on the server?
-        client:publish{topic = "games/" .. playerDetails.uuid, payload="initiated game"}
+        
+        -- client:publish{topic = "games/" .. playerDetails.uuid, payload="initiated game", callback=function()
+        --     client:subscribe{topic = "games/" .. playerDetails.uuid, qos=1, callback=function(msg)
+        --         print("subscribed to " .. "games/" .. playerDetails.uuid .. " successfully")
+        --       end}
+        -- end}
+
+        client:publish{topic = "players", payload=playerDetails, callback=function()
+            client:subscribe{topic = "players", qos=1, callback=function(msg)
+                print("Successfully subscribed to players topic")
+              end}
+        end}
+
         loveframes.SetState("pairingstate")
 	end
 
@@ -43,11 +55,11 @@ function LobbyScreen(loveframes, client)
         {name = "Minsky Walu"},
     }
 
-    for key,player in pairs(players) do
+    for key,player in pairs(availablePlayers) do
         local button = loveframes.Create("button", frame)
         button:SetWidth(300)
         button:SetPos(commonXPosition, 110 + key*30)
-        button:SetText("Play with " .. player["name"])
+        button:SetText("Play with " .. player["username"])
     end
 
     local button1 = loveframes.Create("button", frame)

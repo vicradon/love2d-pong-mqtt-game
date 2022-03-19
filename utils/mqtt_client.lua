@@ -23,6 +23,9 @@ client:on{
     message = function(msg)
         print("received message", msg.payload)
         table.insert(messages, msg)
+        if msg.topic == "players" then
+            table.insert(availablePlayers, msg.payload)
+        end
     end,
 }  
 

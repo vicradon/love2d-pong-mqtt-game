@@ -4,7 +4,7 @@ function HomeScreen(loveframes, client)
     local commonXPosition = 40
     	
 	local frame = loveframes.Create("frame")
-	frame:SetName("Home")
+	frame:SetName(availablePlayersCount) -- This should update with respect to updates made in love.update
 	frame:SetWidth(love.graphics.getWidth())
 	frame:SetHeight(love.graphics.getHeight())
 	frame:ShowCloseButton(false)
@@ -39,6 +39,7 @@ function HomeScreen(loveframes, client)
 			text:SetText("You must set a username to continue")
 			text:Center()
 		else 
+			playerDetails["username"] = textinput:GetText()
 			playerDetails["uuid"] = uuid()
 			loveframes.SetState("lobbystate")
 		end

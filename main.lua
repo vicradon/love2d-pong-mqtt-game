@@ -4,9 +4,12 @@ local client = require('utils.mqtt_client')
 local Home = require("screens.Home")
 local Lobby = require("screens.Lobby")
 local Pairing = require("screens.Pairing")
+local getTableLength = require("utils.get_table_length")
 
 messages = {}
 playerDetails = {}
+availablePlayers = {}
+availablePlayersCount = 0
 
 function love.load()
 	local font = love.graphics.newFont(12)
@@ -18,10 +21,14 @@ function love.load()
 end
 
 function love.update(dt)
+
 	loop = mqtt.get_ioloop()
 	loop:add(client)
 	loop:iteration()
 	loveframes.update(dt)
+
+	availablePlayersCount = availablePlayersCount + 1
+	print(availablePlayersCount)
 end
 
 function love.draw()
