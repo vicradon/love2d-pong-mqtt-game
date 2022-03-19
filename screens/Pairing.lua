@@ -1,25 +1,23 @@
-local ScreenManager = require('libraries.screen_manager.ScreenManager')
-local Screen =  require("libraries.screen_manager.Screen")
-local loveframes =  require("libraries.loveframes")
-
-local LobbyScreen = {}
-
-function LobbyScreen.new()
-    local self = Screen.new()
+function PairingScreen(loveframes, client)
     local commonXPosition = 40
 
-    function self:draw()
-        love.graphics.print("Pairing", 0, 0, 0)
-    end
+	local frame = loveframes.Create("frame")
+    frame:SetName("Pairing")
+	frame:SetWidth(love.graphics.getWidth())
+	frame:SetHeight(love.graphics.getHeight())
+	frame:ShowCloseButton(false)
+    frame:SetState("pairingstate")    
 
-    local infoText = loveframes.Create("text")
+    local infoText = loveframes.Create("text", frame)
 	infoText:SetText({
-        {color={200, 20, 20, 1}},
+        {color={0,0,0, 1}},
         "Waiting for another player to pair"
     })
-    infoText:SetPos(commonXPosition, 40)
+    infoText:Center()
+
+    
 
     return self
 end
 
-return LobbyScreen
+return PairingScreen

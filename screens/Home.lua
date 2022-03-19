@@ -1,20 +1,18 @@
-local ScreenManager = require('libraries.screen_manager.ScreenManager')
-local Screen =  require("libraries.screen_manager.Screen")
-local loveframes =  require("libraries.loveframes")
+local uuid = require("utils.uuid")
 
-local HomeScreen = {}
-
-function HomeScreen.new()
-    local self = Screen.new()
+function HomeScreen(loveframes, client)
     local commonXPosition = 40
+    	
+	local frame = loveframes.Create("frame")
+	frame:SetName("Home")
+	frame:SetWidth(love.graphics.getWidth())
+	frame:SetHeight(love.graphics.getHeight())
+	frame:ShowCloseButton(false)
+    frame:SetState("homestate")
 
-    function self:draw()
-        love.graphics.print("Home", 0, 0, 0)
-    end
-
-    local usernameText = loveframes.Create("text")
+    local usernameText = loveframes.Create("text", frame)
 	usernameText:SetText({
-        {color={200, 20, 20, 1}},
+        {color={0, 0, 0, 1}},
         "Username"
     })
     usernameText:SetPos(commonXPosition, 40)
@@ -22,27 +20,29 @@ function HomeScreen.new()
     local textinput = loveframes.Create("textinput", frame)
 	textinput:SetPos(commonXPosition, 60)
 	textinput:SetWidth(490)
-	textinput.OnEnter = function(object)
-		if not textinput.multiline then
-			object:Clear()
-		end
-	end
 	textinput:SetFont(love.graphics.newFont( "resources/FreeSans-LrmZ.ttf", 12))
 	
 
-    local button = loveframes.Create("button")
+    local button = loveframes.Create("button", frame)
 	button:SetWidth(100)
 	button:SetPos(commonXPosition, 100)
 	button:SetText("Enter")
 
+	loveframes.SetState("homestate")
+
 	button.OnClick = function(object, x, y)
-        ScreenManager.switch('lobby')
+		if textinput:GetText() == "" then
+			local promptFrame = loveframes.Create("frame", frame)
+			promptFrame:SetName("Prompt")
+			promptFrame:Center()
+			local text = loveframes.Create("text", promptFrame)
+			text:SetText("You must set a username to continue")
+			text:Center()
+		else 
+			playerDetails["uuid"] = uuid()
+			loveframes.SetState("lobbystate")
+		end
 	end
-
-
-
-    return self
-
 end
 
 
