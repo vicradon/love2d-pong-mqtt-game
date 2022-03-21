@@ -1,29 +1,27 @@
-local uuid = require("utils.uuid")
-
 function HomeScreen(loveframes, client)
-    local commonXPosition = 40
+  local commonXPosition = 40
+  homeFrame = loveframes.Create("frame")
     	
-	local frame = loveframes.Create("frame")
-	frame:SetName(availablePlayersCount) -- This should update with respect to updates made in love.update
-	frame:SetWidth(love.graphics.getWidth())
-	frame:SetHeight(love.graphics.getHeight())
-	frame:ShowCloseButton(false)
-    frame:SetState("homestate")
+	homeFrame:SetName("Home")
+	homeFrame:SetWidth(love.graphics.getWidth())
+	homeFrame:SetHeight(love.graphics.getHeight())
+	homeFrame:ShowCloseButton(false)
+  homeFrame:SetState("homestate")
 
-    local usernameText = loveframes.Create("text", frame)
+  local usernameText = loveframes.Create("text", homeFrame)
 	usernameText:SetText({
         {color={0, 0, 0, 1}},
         "Username"
     })
     usernameText:SetPos(commonXPosition, 40)
 
-    local textinput = loveframes.Create("textinput", frame)
+  local textinput = loveframes.Create("textinput", homeFrame)
 	textinput:SetPos(commonXPosition, 60)
 	textinput:SetWidth(490)
 	textinput:SetFont(love.graphics.newFont( "resources/FreeSans-LrmZ.ttf", 12))
 	
 
-    local button = loveframes.Create("button", frame)
+  local button = loveframes.Create("button", homeFrame)
 	button:SetWidth(100)
 	button:SetPos(commonXPosition, 100)
 	button:SetText("Enter")
@@ -32,7 +30,7 @@ function HomeScreen(loveframes, client)
 
 	button.OnClick = function(object, x, y)
 		if textinput:GetText() == "" then
-			local promptFrame = loveframes.Create("frame", frame)
+			local promptFrame = loveframes.Create("frame", homeFrame)
 			promptFrame:SetName("Prompt")
 			promptFrame:Center()
 			local text = loveframes.Create("text", promptFrame)
@@ -40,11 +38,22 @@ function HomeScreen(loveframes, client)
 			text:Center()
 		else 
 			playerDetails["username"] = textinput:GetText()
-			playerDetails["uuid"] = uuid()
 			loveframes.SetState("lobbystate")
 		end
 	end
+	
+	homeFrame.up = function() return love.keyboard.isDown("a") end
+
+	
 end
 
+function homeScreenUpdate(dt)
 
-return HomeScreen
+end
+
+local Home = {
+	load = HomeScreen,
+	update = homeScreenUpdate
+}
+
+return Home

@@ -15,16 +15,21 @@ client:on{
         end
         print("connected: ", connack)
 
-        client:subscribe{ topic="input", qos=1, callback=function(msg)
-          print("subscribed successfully" )
+        client:subscribe{ topic="playerPosition", qos=1, callback=function(msg)
+          print("Successfully subscribed to playerPosition topic" )
         end}
+
+        client:subscribe{topic = "players", qos=1, callback=function(msg)
+            print("Successfully subscribed to players topic")
+          end}
     end,
 
     message = function(msg)
-        print("received message", msg.payload)
-        table.insert(messages, msg)
         if msg.topic == "players" then
             table.insert(availablePlayers, msg.payload)
+        end
+        if msg.topic == "playerPosition" then
+            otherPlayerLastPosition = msg.payload
         end
     end,
 }  
