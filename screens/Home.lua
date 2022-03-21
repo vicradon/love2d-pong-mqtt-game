@@ -18,8 +18,6 @@ function HomeScreen(loveframes, client)
   local textinput = loveframes.Create("textinput", homeFrame)
 	textinput:SetPos(commonXPosition, 60)
 	textinput:SetWidth(490)
-	textinput:SetFont(love.graphics.newFont( "resources/FreeSans-LrmZ.ttf", 12))
-	
 
   local button = loveframes.Create("button", homeFrame)
 	button:SetWidth(100)

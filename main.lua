@@ -1,4 +1,4 @@
-local loveframes =  require("libraries.loveframes")
+local loveframes =  require("loveframes")
 local mqtt = require("mqtt")
 local client = require('utils.mqtt_client')
 local Home = require("screens.Home")
