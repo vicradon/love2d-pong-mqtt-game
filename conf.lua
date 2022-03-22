@@ -1,9 +1,6 @@
 function love.conf(t)
-
-	t.title             = "Love Frames Demo"
-	t.author            = "Kenny Shields"
-	t.version           = "11.2"
-	t.identity          = "loveframes-demo"
+	t.title             = "Ably Pong MQTT Game"
+	t.author            = "Osinachi Chukwujama"
 	
 	t.console           = true
 	t.modules.joystick  = false    
@@ -18,5 +15,4 @@ function love.conf(t)
     t.modules.physics   = false
 	t.window.vsync      = false
 	t.window.resizable  = false
-	
 end
