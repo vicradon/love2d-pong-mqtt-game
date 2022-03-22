@@ -2,8 +2,8 @@ local mqtt = require("mqtt")
 
 local client = mqtt.client{ 
     uri = "mqtt.ably.io", 
-    username = "XWrECw.6f7r4Q", 
-    password = "eO3rQBR313098EMjz-G7Aetpde8u_tensyTpB22n0og",
+    username = "XWrECw.6f7r4Q", -- add your password from the API key from Ably
+    password = "eO3rQBR313098EMjz-G7Aetpde8u_tensyTpB22n0og", -- add your password from the API key from Ably
     clean = true
 }
   
@@ -21,17 +21,17 @@ client:on{
 
         client:subscribe{topic = "players", qos=1, callback=function(msg)
             print("Successfully subscribed to players topic")
-          end}
+        end}
     end,
 
-    message = function(msg)
-        if msg.topic == "players" then
-            table.insert(availablePlayers, msg.payload)
-        end
-        if msg.topic == "playerPosition" then
-            otherPlayerLastPosition = msg.payload
-        end
-    end,
+        message = function(msg)
+            if msg.topic == "players" then
+                table.insert(availablePlayers, msg.payload)
+            end
+            if msg.topic == "playerPosition" then
+                otherPlayerLastPosition = msg.payload
+            end
+        end,
 }  
 
 return client

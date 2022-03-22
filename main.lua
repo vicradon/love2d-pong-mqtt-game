@@ -5,7 +5,6 @@ local Home = require("screens.Home")
 local Lobby = require("screens.Lobby")
 local Pairing = require("screens.Pairing")
 local MainGame = require("screens.MainGame")
-local getTableLength = require("utils.get_table_length")
 
 messages = {}
 playerDetails = {}

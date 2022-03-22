@@ -1,10 +1,8 @@
 ├── loveframes
 ├── mqtt
 └── utils
-    ├── get_table_length.lua
     ├── mqtt_client.lua
     ├── split_string.lua
-    └── uuid.lua
 ├── screens
 │   ├── Home.lua
 │   ├── Lobby.lua
