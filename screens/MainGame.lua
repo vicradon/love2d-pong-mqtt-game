@@ -4,11 +4,28 @@ mainGameObjects = {
 	mainGameFrame = nil,
     player = nil,
     otherPlayer = nil,
+    ball,
     client = nil,
     loveframes = nil
 }
 
 function MainGameScreen(loveframes, client)
+    local windowWidth = love.graphics.getWidth()
+    local windowHeight = love.graphics.getHeight()
+    local scoreDetailsYPosition = 30
+    local paddleWidth = 15
+    local paddleHeight = 80
+    local paddleSpeed = 100
+
+    local ballProperties = {
+        radius=10,
+        xVelocity=100,
+        yVelocity=0,
+    }
+
+    -- Temporary
+	loveframes.SetState("maingamestate")
+
     local commonXPosition = 40
     mainGameObjects.client = client
     mainGameObjects.loveframes = loveframes
@@ -22,22 +39,59 @@ function MainGameScreen(loveframes, client)
 
     mainGameObjects.player = loveframes.Create("panel", mainGameObjects.mainGameFrame)
     mainGameObjects.otherPlayer = loveframes.Create("panel", mainGameObjects.mainGameFrame)
+    mainGameObjects.ball = loveframes.Create("panel", mainGameObjects.mainGameFrame)
 
-    -- local playerText = loveframes.Create("text", mainGameFrame)
-	-- mainGameObjects.player:SetText({
-    --     {color={0,0,0, 1}},
-    --     "Player 1"
-    -- })
-    mainGameObjects.player:SetWidth(15)
-    mainGameObjects.player:SetHeight(80)
+    mainGameObjects.player:SetSize(paddleWidth, paddleHeight)
+    mainGameObjects.otherPlayer:SetSize(paddleWidth, paddleHeight)
+    mainGameObjects.ball:SetSize(ballProperties.radius, ballProperties.radius)
 
-    mainGameObjects.otherPlayer:SetWidth(15)
-    mainGameObjects.otherPlayer:SetHeight(80)
+    mainGameObjects.otherPlayer:SetWidth(paddleWidth)
+    mainGameObjects.otherPlayer:SetHeight(paddleHeight)
 
     mainGameObjects.player:SetPos(10, mainGameObjects.mainGameFrame:GetHeight()/2) 
     mainGameObjects.otherPlayer:SetPos(mainGameObjects.mainGameFrame:GetWidth() - 30, mainGameObjects.mainGameFrame:GetHeight()/2) 
-
+    mainGameObjects.ball:Center()
     
+    mainGameObjects.playerScore = loveframes.Create("text", mainGameObjects.mainGameFrame)
+    mainGameObjects.otherPlayerScore = loveframes.Create("text", mainGameObjects.mainGameFrame)
+
+	mainGameObjects.playerScore:SetText({
+        {color={0,0,0, 1}},
+        "0"
+    })
+
+	mainGameObjects.otherPlayerScore:SetText({
+        {color={0,0,0, 1}},
+        "0"
+    })
+
+    local playerIndicator = loveframes.Create("text", mainGameObjects.mainGameFrame)
+    local otherPlayerIndicator = loveframes.Create("text", mainGameObjects.mainGameFrame)
+    local scoreSeparator = loveframes.Create("text", mainGameObjects.mainGameFrame)
+
+    playerIndicator:SetText({
+        {color={0,0,0, 1}},
+        "You"
+    })
+
+    otherPlayerIndicator:SetText({
+        {color={0,0,0, 1}},
+        "Other Player"
+    })
+
+    scoreSeparator:SetText({
+        {color={0,0,0, 1}},
+        "-"
+    })
+
+    playerIndicator:SetPos(windowWidth/2 - 50, scoreDetailsYPosition)
+    mainGameObjects.playerScore:SetPos(windowWidth/2 - 15, scoreDetailsYPosition)
+    
+    otherPlayerIndicator:SetPos(windowWidth/2 + 30, scoreDetailsYPosition)
+    mainGameObjects.otherPlayerScore:SetPos(windowWidth/2 + 15, scoreDetailsYPosition)
+
+    scoreSeparator:SetPos(windowWidth/2, scoreDetailsYPosition)
+
 
     -- if (playerDetails.isPlayer1 == true) then
     --     mainGameObjects.player:SetPos(10, mainGameObjects.mainGameFrame:GetHeight()/2) 
@@ -47,11 +101,67 @@ function MainGameScreen(loveframes, client)
     --     mainGameObjects.player:SetPos(600, mainGameObjects.mainGameFrame:GetHeight()/2)
     -- end
 
-    function mainGameObjects.player.up()
-        return love.keyboard.isDown("up") 
+    -- mainGameObjects.player.draw = function(object)
+    --     love.graphics.setColor(0.5, 0.8, 0.2)
+    --     love.graphics.rectangle("fill", 10, windowHeight/2 - paddleHeight/2, paddleWidth, paddleHeight)
+    --     return object
+    -- end
+
+    function objectsAreColliding(object1, object2)
+        return object1:GetX() + object1:GetWidth() >= object2:GetX()  
+        and object2:GetX() + object2:GetWidth() >= object1:GetX() 
+        and object1:GetY() + object1:GetHeight() >= object2:GetY() 
+        and object2:GetY() + object2:GetHeight() >= object1:GetY()
     end
-    function mainGameObjects.player.down()
-        return love.keyboard.isDown("down") 
+
+    mainGameObjects.ball.Update = function(object, dt)
+        object:SetX(object:GetX() + (ballProperties.xVelocity * dt))
+        object:SetY(object:GetY() + (ballProperties.yVelocity * dt))
+
+        if (objectsAreColliding(object, mainGameObjects.player)) then
+            ballProperties.xVelocity = -ballProperties.xVelocity
+            -- print(object:GetX())
+            -- object:SetX(object:GetX() + (ballProperties.xVelocity * dt))
+        end
+    end
+    
+    
+    mainGameObjects.player.Update = function(object, dt)
+        if love.keyboard.isDown("up") then
+            object:SetY(object:GetY() - (paddleSpeed * dt))
+        end
+        if love.keyboard.isDown("down") then
+            object:SetY(object:GetY() + (paddleSpeed * dt))
+        end
+        -- if love.keyboard.isDown("left") then
+        --     object:SetX(object:GetX() - (paddleSpeed * dt))
+        -- end
+        -- if love.keyboard.isDown("right") then
+        --     object:SetX(object:GetX() + (paddleSpeed * dt))
+        -- end
+    end
+
+    mainGameObjects.player.keypressed = function(object, key)
+        -- print(object, key)
+        -- if (key == 'up') then
+        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 10)
+        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
+        -- end
+        -- if (key == 'down') then
+        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 10)
+        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
+        -- end
+    end
+
+    mainGameObjects.player.keyreleased = function(object, key)
+        -- if (key == 'up') then
+        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 10)
+        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
+        -- end
+        -- if (key == 'down') then
+        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 10)
+        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
+        -- end
     end
 
     return self
@@ -76,33 +186,17 @@ function MainGameUpdate(dt)
     end
 end
 
-function handleKeyPressed(key, scancode, isrepeat) 
-    if (key == 'up') then
-        mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 1)
-        mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-    end
-    if (key == 'down') then
-        mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 1)
-        mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-    end
-end
 
-function handleKeyReleased(key, scancode, isrepeat) 
-    if (key == 'up') then
-        mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 1)
-        mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-    end
-    if (key == 'down') then
-        mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 1)
-        mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-    end
-end
 
 local MainGame = {
     load = MainGameScreen,
-    update = MainGameUpdate,
-    keypressed = handleKeyPressed,
-    keyreleased = handleKeyReleased
+    update = MainGameUpdate
 }
 
 return MainGame
+
+
+    -- mainGameObjects.ball.Draw = function(object) 
+    --     love.graphics.setColor(1, 0.3, 0.3)
+    --     love.graphics.circle("fill", windowWidth/2, windowHeight/2, 5)
+    -- end

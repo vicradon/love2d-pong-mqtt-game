@@ -15,13 +15,10 @@ function love.load()
 	local font = love.graphics.newFont(12)
 	love.graphics.setFont(font)
 
-	Home.load(loveframes, client)
-	Lobby.load(loveframes, client)
-	Pairing.load(loveframes, client)
+	-- Home.load(loveframes, client)
+	-- Lobby.load(loveframes, client)
+	-- Pairing.load(loveframes, client)
 	MainGame.load(loveframes, client)
-	-- create a ball
-	-- use collisions
-	-- create a moveable rectangle
 end
 
 function love.update(dt)
@@ -61,12 +58,10 @@ end
 
 function love.keypressed(key, isrepeat)
 	loveframes.keypressed(key, isrepeat)
-	MainGame.keypressed(key)
 end
 
 function love.keyreleased(key)
 	loveframes.keyreleased(key)
-	MainGame.keyreleased(key)
 end
 
 function love.textinput(text)
