@@ -22,16 +22,23 @@ client:on{
         client:subscribe{topic = "players", qos=1, callback=function(msg)
             print("Successfully subscribed to players topic")
         end}
+
+        client:subscribe{topic = "playerScores", qos=1, callback=function(msg)
+            print("Successfully subscribed to playerScores topic")
+        end}
     end,
 
-        message = function(msg)
-            if msg.topic == "players" then
-                table.insert(availablePlayers, msg.payload)
-            end
-            if msg.topic == "playerPosition" then
-                otherPlayerLastPosition = msg.payload
-            end
-        end,
+    message = function(msg)
+        if msg.topic == "players" then
+            table.insert(availablePlayers, msg.payload)
+        end
+        if msg.topic == "playerPosition" then
+            otherPlayerLastPosition = msg.payload
+        end
+        if msg.topic == "playerScores" then
+            lastPlayerScore = msg.payload
+        end
+    end,
 }  
 
 return client

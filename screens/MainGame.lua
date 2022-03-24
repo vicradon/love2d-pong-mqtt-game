@@ -6,8 +6,15 @@ mainGameObjects = {
     otherPlayer = nil,
     ball,
     client = nil,
-    loveframes = nil
+    loveframes = nil,
+    playerScore = nil,
+    otherPlayerScore = nil
 }
+
+function setPlayersPositions(mainGameObjects)
+    mainGameObjects.player:SetPos(10, mainGameObjects.mainGameFrame:GetHeight()/2) 
+    mainGameObjects.otherPlayer:SetPos(mainGameObjects.mainGameFrame:GetWidth() - 30, mainGameObjects.mainGameFrame:GetHeight()/2) 
+end
 
 function MainGameScreen(loveframes, client)
     local windowWidth = love.graphics.getWidth()
@@ -22,9 +29,6 @@ function MainGameScreen(loveframes, client)
         xVelocity=100,
         yVelocity=0,
     }
-
-    -- Temporary
-	loveframes.SetState("maingamestate")
 
     local commonXPosition = 40
     mainGameObjects.client = client
@@ -48,8 +52,7 @@ function MainGameScreen(loveframes, client)
     mainGameObjects.otherPlayer:SetWidth(paddleWidth)
     mainGameObjects.otherPlayer:SetHeight(paddleHeight)
 
-    mainGameObjects.player:SetPos(10, mainGameObjects.mainGameFrame:GetHeight()/2) 
-    mainGameObjects.otherPlayer:SetPos(mainGameObjects.mainGameFrame:GetWidth() - 30, mainGameObjects.mainGameFrame:GetHeight()/2) 
+    setPlayersPositions(mainGameObjects)
     mainGameObjects.ball:Center()
     
     mainGameObjects.playerScore = loveframes.Create("text", mainGameObjects.mainGameFrame)
@@ -92,21 +95,6 @@ function MainGameScreen(loveframes, client)
 
     scoreSeparator:SetPos(windowWidth/2, scoreDetailsYPosition)
 
-
-    -- if (playerDetails.isPlayer1 == true) then
-    --     mainGameObjects.player:SetPos(10, mainGameObjects.mainGameFrame:GetHeight()/2) 
-    -- end
-
-    -- if (playerDetails.isPlayer1 == false) then
-    --     mainGameObjects.player:SetPos(600, mainGameObjects.mainGameFrame:GetHeight()/2)
-    -- end
-
-    -- mainGameObjects.player.draw = function(object)
-    --     love.graphics.setColor(0.5, 0.8, 0.2)
-    --     love.graphics.rectangle("fill", 10, windowHeight/2 - paddleHeight/2, paddleWidth, paddleHeight)
-    --     return object
-    -- end
-
     function objectsAreColliding(object1, object2)
         return object1:GetX() + object1:GetWidth() >= object2:GetX()  
         and object2:GetX() + object2:GetWidth() >= object1:GetX() 
@@ -114,89 +102,83 @@ function MainGameScreen(loveframes, client)
         and object2:GetY() + object2:GetHeight() >= object1:GetY()
     end
 
+    function otherPlayerScores()
+        return mainGameObjects.ball:GetX() <= mainGameObjects.player:GetX() and not(objectsAreColliding(mainGameObjects.player, mainGameObjects.ball))
+    end
+
+    function playerScores()
+        return mainGameObjects.ball:GetX() >= mainGameObjects.otherPlayer:GetX() and not(objectsAreColliding(mainGameObjects.otherPlayer, mainGameObjects.ball))
+    end
+
+  
+
+    function resetGame()
+        mainGameObjects.ball:Center()
+        setPlayersPositions(mainGameObjects)
+    end
+
     mainGameObjects.ball.Update = function(object, dt)
-        object:SetX(object:GetX() + (ballProperties.xVelocity * dt))
-        object:SetY(object:GetY() + (ballProperties.yVelocity * dt))
+        object:SetX(object:GetX() - (ballProperties.xVelocity * dt))
+        object:SetY(object:GetY() - (ballProperties.yVelocity * dt))
 
         if (objectsAreColliding(object, mainGameObjects.player)) then
             ballProperties.xVelocity = -ballProperties.xVelocity
-            -- print(object:GetX())
-            -- object:SetX(object:GetX() + (ballProperties.xVelocity * dt))
+            object:SetX(object:GetX() + (-ballProperties.xVelocity * dt))
+        end
+        if (objectsAreColliding(object, mainGameObjects.otherPlayer)) then
+            ballProperties.xVelocity = -ballProperties.xVelocity
+            object:SetX(object:GetX() + (-ballProperties.xVelocity * dt))
+        end
+
+
+        if (playerScores()) then
+            mainGameObjects.playerScore:SetText({
+                {color={0,0,0, 1}},
+                mainGameObjects.playerScore:GetText() + 1
+            })
+            mainGameObjects.client:publish{topic="playerScores", payload=mainGameObjects.playerScore:GetText() .. "=" ..  playerDetails.username}
+            resetGame()
+        end        
+
+        if (otherPlayerScores()) then
+            mainGameObjects.playerScore:SetText({
+                {color={0,0,0, 1}},
+                mainGameObjects.otherPlayerScore:GetText() + 1
+            })
+            mainGameObjects.client:publish{topic="playerScores", payload=mainGameObjects.playerScore:GetText() .. "=" ..  playerDetails.username}
+            resetGame()
         end
     end
-    
     
     mainGameObjects.player.Update = function(object, dt)
         if love.keyboard.isDown("up") then
             object:SetY(object:GetY() - (paddleSpeed * dt))
+            mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
         end
         if love.keyboard.isDown("down") then
             object:SetY(object:GetY() + (paddleSpeed * dt))
+            mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
         end
-        -- if love.keyboard.isDown("left") then
-        --     object:SetX(object:GetX() - (paddleSpeed * dt))
-        -- end
-        -- if love.keyboard.isDown("right") then
-        --     object:SetX(object:GetX() + (paddleSpeed * dt))
-        -- end
-    end
-
-    mainGameObjects.player.keypressed = function(object, key)
-        -- print(object, key)
-        -- if (key == 'up') then
-        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 10)
-        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-        -- end
-        -- if (key == 'down') then
-        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 10)
-        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-        -- end
-    end
-
-    mainGameObjects.player.keyreleased = function(object, key)
-        -- if (key == 'up') then
-        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 10)
-        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-        -- end
-        -- if (key == 'down') then
-        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 10)
-        --     -- mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-        -- end
-    end
-
-    return self
-end
-
-function MainGameUpdate(dt)
-    if mainGameObjects.loveframes:GetState() == "maingamestate" then
-        -- if mainGameObjects.player.up() then
-        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() - 1)
-        --     mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-        -- end
-        -- if mainGameObjects.player.down() then
-        --     mainGameObjects.player:SetY(mainGameObjects.player:GetY() + 1)
-        --     mainGameObjects.client:publish{topic="playerPosition", payload=mainGameObjects.player:GetY() .. "=" ..  playerDetails.username}
-        -- end
 
         if (splitString(otherPlayerLastPosition, "=")[2] ~= playerDetails.username) then
             if splitString(otherPlayerLastPosition, "=")[1] ~= nil then
                 mainGameObjects.otherPlayer:SetY(splitString(otherPlayerLastPosition, "=")[1])
             end
+        end        
+    end
+
+    mainGameObjects.mainGameFrame.Update = function(object, dt)
+        if (splitString(lastPlayerScore, "=")[2] ~= playerDetails.username) then
+            if splitString(lastPlayerScore, "=")[1] ~= nil then
+                print(splitString(otherPlayerLastPosition, "=")[1])
+                mainGameObjects.otherPlayerScore:SetText(splitString(otherPlayerLastPosition, "=")[1])
+            end
         end
     end
+    return self
 end
 
 
 
-local MainGame = {
-    load = MainGameScreen,
-    update = MainGameUpdate
-}
+return MainGameScreen
 
-return MainGame
-
-
-    -- mainGameObjects.ball.Draw = function(object) 
-    --     love.graphics.setColor(1, 0.3, 0.3)
-    --     love.graphics.circle("fill", windowWidth/2, windowHeight/2, 5)
-    -- end

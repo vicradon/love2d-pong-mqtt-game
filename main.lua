@@ -10,15 +10,16 @@ messages = {}
 playerDetails = {}
 availablePlayers = {}
 otherPlayerLastPosition = nil
+lastPlayerScore = nil
 
 function love.load()
 	local font = love.graphics.newFont(12)
 	love.graphics.setFont(font)
 
-	-- Home.load(loveframes, client)
-	-- Lobby.load(loveframes, client)
-	-- Pairing.load(loveframes, client)
-	MainGame.load(loveframes, client)
+	Home(loveframes, client)
+	Lobby(loveframes, client)
+	Pairing(loveframes, client)
+	MainGame(loveframes, client)
 end
 
 function love.update(dt)
@@ -34,9 +35,6 @@ function love.update(dt)
 	loop:add(client)
 	loop:iteration()
 	loveframes.update(dt)
-
-	Home.update(dt)
-	MainGame.update(dt)
 end
 
 function love.draw()

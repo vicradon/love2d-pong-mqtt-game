@@ -45,13 +45,4 @@ function HomeScreen(loveframes, client)
 	
 end
 
-function homeScreenUpdate(dt)
-
-end
-
-local Home = {
-	load = HomeScreen,
-	update = homeScreenUpdate
-}
-
-return Home
+return HomeScreen

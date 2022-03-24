@@ -15,14 +15,7 @@ function PairingScreen(loveframes, client)
     })
     infoText:Center()
 
-    -- How to send data here
-    -- Either use the main.lua to get the current state and set the state immediately in that function where we make the button visible and
-    -- somehow trigger the event from this running instance when the start game button is clicked
     return self
 end
 
-local Pairing = {
-    load = PairingScreen
-}
-
-return Pairing
+return PairingScreen

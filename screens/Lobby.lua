@@ -50,12 +50,4 @@ function LobbyScreen(loveframes, client)
     return self
 end
 
-
-local Lobby = {
-    load = LobbyScreen
-}
-
-return Lobby
-
--- set up username setting
--- set up start game
+return LobbyScreen
