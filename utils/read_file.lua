@@ -1,6 +1,6 @@
 function readFile(path)
     local file = io.open(path, "rb") 
-    if not file then return nil end
+    if not file then return {} end
     
     local lines = {}
     

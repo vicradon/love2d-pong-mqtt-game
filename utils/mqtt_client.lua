@@ -1,20 +1,15 @@
 local mqtt = require("mqtt")
-local readFile = require("utils.read_file")
-local splitString = require("utils.split_string")
-
-local username = splitString(readFile(".env")[1], "=")[2]
-local password = splitString(readFile(".env")[2], "=")[2]
+local authDetails = require("utils.auth_agent")
 
 local client = mqtt.client{ 
     uri = "mqtt.ably.io",
-    username = username,
-    password = password,
+    username = authDetails.username,
+    password = authDetails.password,
     clean = true
 }
   
 client:on{
     connect = function(connack)
-        print(username, password)
         if connack.rc ~= 0 then
             print("connection to broker failed:", connack:reason_string(), connack)
             return

@@ -1,7 +1,6 @@
 function splitString(pString, pPattern)
-    if not(pString) then
-        return {}
-    end
+    if not(pString) then return {} end
+    
     local Table = {}  -- NOTE: use {n = 0} in Lua-5.0
     local fpat = "(.-)" .. pPattern
     local last_end = 1
